@@ -1,7 +1,7 @@
 {
   "canisters": {
     "nexBit_backend": {
-      "build": "python -m kybra nexBit_backend src/nexBit_backend/src/main.py src/nexBit_backend/nexBit_backend.did",
+      "build": "python -m kybra nexBit_backend src/nexBit_backend/src/main.py",
       "candid": "src/nexBit_backend/nexBit_backend.did",
       "gzip": true,
       "post_install": ".kybra/nexBit_backend/post_install.sh",
@@ -17,12 +17,8 @@
       "wasm": ".kybra/nexBit_backend/nexBit_backend.wasm"
     },
     "nexBit_frontend": {
-      "dependencies": [
-        "nexBit_backend"
-      ],
-      "source": [
-        "src/nexBit_frontend/dist"
-      ],
+      "dependencies": ["nexBit_backend"],
+      "source": ["src/nexBit_frontend/dist"],
       "type": "assets",
       "workspace": "nexBit_frontend"
     }
