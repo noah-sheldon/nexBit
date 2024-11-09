@@ -25,3 +25,18 @@ dist/
 .env
 bitcoin-27.0
 .*
+
+# Various IDEs and Editors
+.vscode/
+.idea/
+**/*~
+
+# Mac OSX temporary files
+.DS_Store
+**/.DS_Store
+
+# dfx temporary files
+.dfx/
+
+# rust
+target/

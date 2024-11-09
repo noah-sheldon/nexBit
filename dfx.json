@@ -1,5 +1,17 @@
 {
   "canisters": {
+    "basic_bitcoin": {
+      "type": "custom",
+      "package": "basic_bitcoin",
+      "candid": "src/basic_bitcoin/basic_bitcoin.did",
+      "wasm": "target/wasm32-unknown-unknown/release/basic_bitcoin.wasm",
+      "build": "src/basic_bitcoin/build.sh",
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
     "internet_identity": {
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
       "frontend": {},
@@ -17,28 +29,8 @@
         }
       }
     },
-    "nexBit_backend": {
-      "build": "python -m kybra nexBit_backend src/nexBit_backend/src/main.py",
-      "candid": "src/nexBit_backend/nexBit_backend.did",
-      "gzip": true,
-      "metadata": [
-        {
-          "name": "candid:service"
-        }
-      ],
-      "tech_stack": {
-        "cdk": {
-          "kybra": {}
-        },
-        "language": {
-          "python": {}
-        }
-      },
-      "type": "custom",
-      "wasm": ".kybra/nexBit_backend/nexBit_backend.wasm"
-    },
     "nexBit_frontend": {
-      "dependencies": ["nexBit_backend"],
+      "dependencies": ["basic_bitcoin"],
       "source": ["src/nexBit_frontend/dist"],
       "type": "assets",
       "workspace": "nexBit_frontend"
@@ -46,8 +38,7 @@
   },
   "networks": {
     "local": {
-      "bind": "127.0.0.1:8001",
-      "type": "ephemeral"
+      "bind": "127.0.0.1:4943"
     }
   },
   "defaults": {
