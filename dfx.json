@@ -1,5 +1,22 @@
 {
   "canisters": {
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
+      "networks": {
+        "local": {
+          "bind": "127.0.0.1:8000",
+          "type": "ephemeral"
+        }
+      }
+    },
     "nexBit_backend": {
       "build": "python -m kybra nexBit_backend src/nexBit_backend/src/main.py",
       "candid": "src/nexBit_backend/nexBit_backend.did",
@@ -29,15 +46,19 @@
   },
   "networks": {
     "local": {
-      "bind": "127.0.0.1:8000",
+      "bind": "127.0.0.1:8001",
       "type": "ephemeral"
     }
   },
   "defaults": {
     "bitcoin": {
       "enabled": true,
-      "nodes": ["127.0.0.1:18444"],
-      "log_level": "info"
+      "log_level": "info",
+      "nodes": ["127.0.0.1:18444"]
+    },
+    "build": {
+      "args": "",
+      "packtool": ""
     }
   },
   "output_env_file": ".env",
