@@ -3,7 +3,9 @@ import { nexBit_backend } from 'declarations/nexBit_backend';
 
 function App() {
   const [greeting, setGreeting] = useState('');
+  const [name, setName] = useState('');
   const [balance, setBalance] = useState(null);
+  const [address, setAddress] = useState('');
   const [feePercentiles, setFeePercentiles] = useState([]);
   const [utxos, setUtxos] = useState([]);
   const [btcAmount, setBtcAmount] = useState('');
@@ -11,13 +13,13 @@ function App() {
   const [sendResult, setSendResult] = useState(null);
 
   // Greeting Function
-  async function handleGreet(name) {
+  async function handleGreet() {
     const result = await nexBit_backend.greet(name);
     setGreeting(result);
   }
 
   // Get Balance Function
-  async function handleGetBalance(address) {
+  async function handleGetBalance() {
     const result = await nexBit_backend.get_balance(address);
     setBalance(result.Ok ? result.Ok : `Error: ${result.Err}`);
   }
@@ -29,7 +31,7 @@ function App() {
   }
 
   // Get UTXOs Function
-  async function handleGetUtxos(address) {
+  async function handleGetUtxos() {
     const result = await nexBit_backend.get_utxos(address);
     setUtxos(result.Ok ? result.Ok.utxos : `Error: ${result.Err}`);
   }
@@ -48,11 +50,6 @@ function App() {
 
   return (
     <main className="min-h-screen bg-gray-900 text-white p-4 md:p-10 font-sans">
-      <header className="text-center mb-10">
-        <img src="/logo2.svg" alt="nexBit Logo" className="mx-auto w-20 md:w-32" />
-        <h1 className="text-3xl md:text-4xl font-bold mt-4">nexBit</h1>
-        <p className="text-gray-400 mt-2">Explore Bitcoin Network Metrics on Local Network</p>
-      </header>
 
       {/* Greeting Section */}
       <section className="my-8 text-center">
@@ -60,10 +57,11 @@ function App() {
         <input
           type="text"
           placeholder="Enter your name"
-          onChange={(e) => handleGreet(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="mt-2 p-2 rounded bg-gray-800 text-white w-full md:w-1/2"
         />
-        <button onClick={() => handleGreet(name)} className="bg-blue-500 px-4 py-2 rounded mt-4 hover:bg-blue-400">
+        <button onClick={handleGreet} className="bg-blue-500 px-4 py-2 rounded mt-4 hover:bg-blue-400">
           Submit
         </button>
         <p className="mt-4 text-lg">{greeting}</p>
@@ -75,10 +73,11 @@ function App() {
         <input
           type="text"
           placeholder="Enter Bitcoin Address"
-          onBlur={(e) => handleGetBalance(e.target.value)}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
           className="mt-2 p-2 rounded bg-gray-800 text-white w-full md:w-1/2"
         />
-        <button onClick={() => handleGetBalance(address)} className="bg-blue-500 px-4 py-2 rounded mt-4 hover:bg-blue-400">
+        <button onClick={handleGetBalance} className="bg-blue-500 px-4 py-2 rounded mt-4 hover:bg-blue-400">
           Check Balance
         </button>
         <p className="mt-4 text-lg">{balance !== null && `Balance: ${balance} Satoshi`}</p>
@@ -105,10 +104,11 @@ function App() {
         <input
           type="text"
           placeholder="Enter Bitcoin Address"
-          onBlur={(e) => handleGetUtxos(e.target.value)}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
           className="mt-2 p-2 rounded bg-gray-800 text-white w-full md:w-1/2"
         />
-        <button onClick={() => handleGetUtxos(address)} className="bg-blue-500 px-4 py-2 rounded mt-4 hover:bg-blue-400">
+        <button onClick={handleGetUtxos} className="bg-blue-500 px-4 py-2 rounded mt-4 hover:bg-blue-400">
           Check UTXOs
         </button>
         <ul className="mt-4 space-y-2">
