@@ -4,11 +4,53 @@ mod ecdsa_api;
 mod schnorr_api;
 
 use candid::{CandidType, Deserialize};
-use ic_cdk::api::management_canister::bitcoin::{
-    BitcoinNetwork, GetUtxosResponse, MillisatoshiPerByte,
+use ic_cdk::api::management_canister::http_request::{
+    http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse,
 };
+use ic_cdk::api::management_canister::bitcoin::{BitcoinNetwork, GetUtxosResponse, MillisatoshiPerByte};
 use ic_cdk_macros::{init, update};
+use serde::Serialize;
+use serde_json::{self, Value};
 use std::cell::{Cell, RefCell};
+
+#[derive(CandidType, Deserialize, Serialize, Debug)]
+struct BlockchainStats {
+    blocks: u64,
+    transactions: u64,
+    outputs: u64,
+    circulation: u64,
+    blocks_24h: u64,
+    transactions_24h: u64,
+    difficulty: f64,
+    volume_24h: u64,
+    mempool_transactions: u64,
+    mempool_size: u64,
+    mempool_tps: f64,
+    mempool_total_fee_usd: f64,
+    best_block_height: u64,
+    best_block_hash: String,
+    best_block_time: String,
+    blockchain_size: u64,
+    average_transaction_fee_24h: u64,
+    inflation_24h: u64,
+    median_transaction_fee_24h: u64,
+    cdd_24h: f64,
+    mempool_outputs: u64,
+    nodes: u64,
+    hashrate_24h: String,
+    inflation_usd_24h: f64,
+    average_transaction_fee_usd_24h: f64,
+    median_transaction_fee_usd_24h: f64,
+    market_price_usd: f64,
+    market_price_btc: f64,
+    market_price_usd_change_24h_percentage: f64,
+    market_cap_usd: f64,
+    market_dominance_percentage: f64,
+    next_retarget_time_estimate: Option<String>,
+    next_difficulty_estimate: Option<f64>,
+    suggested_transaction_fee_per_byte_sat: u64,
+    hodling_addresses: u64,
+}
 
 thread_local! {
     // The bitcoin network to connect to.
@@ -189,4 +231,35 @@ pub async fn send_from_p2tr_raw_key_spend(request: SendRequest) -> String {
 pub struct SendRequest {
     pub destination_address: String,
     pub amount_in_satoshi: u64,
+}
+
+#[update]
+async fn get_blockchain_stats() -> Result<BlockchainStats, String> {
+    let url = "https://api.blockchair.com/bitcoin/stats";
+
+    let request = CanisterHttpRequestArgument {
+        url: url.to_string(),
+        method: HttpMethod::GET,
+        headers: vec![HttpHeader {
+            name: "User-Agent".to_string(),
+            value: "Internet Computer Canister".to_string(),
+        }],
+        body: None,
+        max_response_bytes: Some(1024 * 16),
+        transform: None,
+    };
+
+    // HTTP Request
+    let (response,): (HttpResponse,) = http_request(request, 20_000_000)
+        .await
+        .map_err(|err| format!("Failed to fetch data: {:?}", err))?;
+
+    // Parse the JSON response
+    let parsed_json: Value = serde_json::from_slice(&response.body)
+        .map_err(|err| format!("Failed to parse JSON: {:?}", err))?;
+
+    let stats: BlockchainStats = serde_json::from_value(parsed_json["data"].clone())
+        .map_err(|err| format!("Failed to parse data field: {:?}", err))?;
+
+    Ok(stats)
 }
