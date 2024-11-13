@@ -2,7 +2,6 @@ mod bitcoin_api;
 mod bitcoin_wallet;
 mod ecdsa_api;
 mod schnorr_api;
-
 use candid::{CandidType, Deserialize};
 use ic_cdk::api::management_canister::http_request::{
     http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse,
@@ -17,65 +16,33 @@ use std::cell::{Cell, RefCell};
 pub struct BlockchainStats {
     blocks: u64,
     transactions: u64,
-    outputs: u64,
-    circulation: u64,
-    blocks_24h: u64,
-    transactions_24h: u64,
-    difficulty: f64,
-    volume_24h: u64,
-    mempool_transactions: u64,
-    mempool_size: u64,
-    mempool_tps: f64,
-    mempool_total_fee_usd: f64,
-    best_block_height: u64,
-    best_block_hash: String,
-    best_block_time: String,
-    blockchain_size: u64,
-    average_transaction_fee_24h: u64,
-    inflation_24h: u64,
-    median_transaction_fee_24h: u64,
-    cdd_24h: f64,
-    mempool_outputs: u64,
-    nodes: u64,
-    hashrate_24h: String,
-    inflation_usd_24h: f64,
-    average_transaction_fee_usd_24h: f64,
-    median_transaction_fee_usd_24h: f64,
     market_price_usd: f64,
-    market_price_btc: f64,
-    market_price_usd_change_24h_percentage: f64,
     market_cap_usd: f64,
+    difficulty: f64,
+    average_transaction_fee_usd_24h: f64,
     market_dominance_percentage: f64,
-    next_retarget_time_estimate: Option<String>,
-    next_difficulty_estimate: Option<f64>,
     suggested_transaction_fee_per_byte_sat: u64,
-    hodling_addresses: u64,
 }
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct BlockSummary {
-    block_height: u64,
-    block_hash: String,
-    timestamp: String,
-    transaction_count: u64,
+    pub block_height: u64,
+    pub block_hash: String,
+    pub date: String,
+    pub time: String,
+    pub transaction_count: u64,
+    pub fee_total: u64,
+    pub block_size: u64,
+    pub difficulty: f64,
 }
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct TransactionSummary {
-    txid: Option<String>,
-    time: Option<String>,
-    input_total: Option<u64>,
-    input_total_usd: Option<f64>,
-    output_total: Option<u64>,
-    output_total_usd: Option<f64>,
-    fee: Option<u64>,
-    fee_usd: Option<f64>,
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub struct PricePoint {
-    timestamp: String,
-    price_usd: f64,
+    pub txid: String,
+    pub time: String,
+    pub input_total_usd: f64,
+    pub output_total_usd: f64,
+    pub fee_usd: f64,
 }
 
 thread_local! {
@@ -267,10 +234,26 @@ pub async fn get_latest_blocks() -> Result<Vec<BlockSummary>, String> {
     let (response,): (HttpResponse,) = http_request(request, 20_000_000)
         .await
         .map_err(|err| format!("Failed to fetch recent blocks: {:?}", err))?;
+
     let parsed_json: Value = serde_json::from_slice(&response.body)
         .map_err(|err| format!("Failed to parse JSON: {:?}", err))?;
-    let blocks: Vec<BlockSummary> = serde_json::from_value(parsed_json["data"].clone())
-        .map_err(|err| format!("Failed to parse block summaries: {:?}", err))?;
+
+    let blocks: Vec<BlockSummary> = parsed_json["data"]
+        .as_array()
+        .unwrap_or(&vec![])
+        .iter()
+        .map(|block| BlockSummary {
+            block_height: block["id"].as_u64().unwrap_or(0) as u64,
+            block_hash: block["hash"].as_str().unwrap_or("").to_string(),
+            date: block["date"].as_str().unwrap_or("").to_string(),
+            time: block["time"].as_str().unwrap_or("").to_string(),
+            transaction_count: block["transaction_count"].as_u64().unwrap_or(0) as u64,
+            fee_total: block["fee_total"].as_u64().unwrap_or(0) as u64,
+            block_size: block["size"].as_u64().unwrap_or(0) as u64,
+            difficulty: block["difficulty"].as_f64().unwrap_or(0.0) as f64,
+        })
+        .collect();
+
     Ok(blocks)
 }
 
@@ -300,47 +283,13 @@ pub async fn get_latest_transactions() -> Result<Vec<TransactionSummary>, String
         .unwrap_or(&vec![])
         .iter()
         .map(|tx| TransactionSummary {
-            txid: tx["hash"].as_str().map(|s| s.to_string()),
-            time: tx["time"].as_str().map(|s| s.to_string()),
-            input_total: tx["input_total"].as_u64(),
-            input_total_usd: tx["input_total_usd"].as_f64(),
-            output_total: tx["output_total"].as_u64(),
-            output_total_usd: tx["output_total_usd"].as_f64(),
-            fee: tx["fee"].as_u64(),
-            fee_usd: tx["fee_usd"].as_f64(),
+            txid: tx["hash"].as_str().unwrap_or("").to_string(),
+            time: tx["time"].as_str().unwrap_or("").to_string(),
+            input_total_usd: tx["input_total_usd"].as_f64().unwrap_or(0.0),
+            output_total_usd: tx["output_total_usd"].as_f64().unwrap_or(0.0),
+            fee_usd: tx["fee_usd"].as_f64().unwrap_or(0.0),
         })
         .collect();
 
     Ok(transactions)
-}
-
-#[update]
-pub async fn get_latest_price() -> Result<PricePoint, String> {
-    let url = "https://api.blockchair.com/bitcoin/stats";
-    let request = CanisterHttpRequestArgument {
-        url: url.to_string(),
-        method: HttpMethod::GET,
-        headers: vec![HttpHeader {
-            name: "User-Agent".to_string(),
-            value: "Internet Computer Canister".to_string(),
-        }],
-        body: None,
-        max_response_bytes: Some(1024 * 16),
-        transform: None,
-    };
-    let (response,): (HttpResponse,) = http_request(request, 20_000_000)
-        .await
-        .map_err(|err| format!("Failed to fetch Bitcoin price: {:?}", err))?;
-    
-    let parsed_json: Value = serde_json::from_slice(&response.body)
-        .map_err(|err| format!("Failed to parse JSON: {:?}", err))?;
-    
-    let price_point = PricePoint {
-        timestamp: parsed_json["data"]["time"].as_str().unwrap_or("").to_string(),
-        price_usd: parsed_json["data"]["market_price_usd"]
-            .as_f64()
-            .unwrap_or(0.0),
-    };
-    
-    Ok(price_point)
 }

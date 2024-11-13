@@ -21,65 +21,34 @@ type outpoint = record {
   vout : nat32;
 };
 
-type PricePoint = record {
-    timestamp: text;
-    price_usd: float64;
-};
-
 type BlockchainStats = record {
     blocks: nat64;
     transactions: nat64;
-    outputs: nat64;
-    circulation: nat64;
-    blocks_24h: nat64;
-    transactions_24h: nat64;
     difficulty: float64;
-    volume_24h: nat64;
-    mempool_transactions: nat64;
-    mempool_size: nat64;
-    mempool_tps: float64;
-    mempool_total_fee_usd: float64;
-    best_block_height: nat64;
-    best_block_hash: text;
-    best_block_time: text;
-    blockchain_size: nat64;
-    average_transaction_fee_24h: nat64;
-    inflation_24h: nat64;
-    median_transaction_fee_24h: nat64;
-    cdd_24h: float64;
-    mempool_outputs: nat64;
-    nodes: nat64;
-    hashrate_24h: text;
-    inflation_usd_24h: float64;
-    average_transaction_fee_usd_24h: float64;
-    median_transaction_fee_usd_24h: float64;
     market_price_usd: float64;
-    market_price_btc: float64;
-    market_price_usd_change_24h_percentage: float64;
     market_cap_usd: float64;
+    average_transaction_fee_usd_24h: float64;
     market_dominance_percentage: float64;
-    next_retarget_time_estimate: opt text;
-    next_difficulty_estimate: opt float64;
     suggested_transaction_fee_per_byte_sat: nat64;
-    hodling_addresses: nat64;
 };
 
 type BlockSummary = record {
-    block_height: block_height;
+    block_height: nat64;
     block_hash: text;
-    timestamp: text;
+    date: text;
+    time: text;
     transaction_count: nat64;
+    fee_total: nat64;
+    block_size: nat64;
+    difficulty: float64;
 };
 
 type TransactionSummary = record {
-  txid: text;
-  time: text;
-  input_total: nat64;
-  input_total_usd: float64;
-  output_total: nat64;
-  output_total_usd: float64;
-  fee: nat64;
-  fee_usd: float64;
+    txid: text;
+    time: text;
+    input_total_usd: float64;
+    output_total_usd: float64;
+    fee_usd: float64;
 };
 
 type utxo = record {
@@ -141,5 +110,4 @@ service : (network) -> {
   "get_blockchain_stats" : () -> (variant { Ok : BlockchainStats; Err : text });
   "get_latest_blocks" : () -> (variant { Ok : vec BlockSummary; Err : text });
   "get_latest_transactions" : () -> (variant { Ok : vec TransactionSummary; Err : text });
-  "get_latest_price" : () -> (variant { Ok : PricePoint; Err : text });
 };
