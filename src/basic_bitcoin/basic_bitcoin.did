@@ -8,8 +8,6 @@ type transaction_id = text;
 
 type block_hash = blob;
 
-type block_height = nat32;
-
 type network = variant {
   regtest;
   testnet;
@@ -60,11 +58,12 @@ type utxo = record {
 type get_utxos_response = record {
   utxos : vec utxo;
   tip_block_hash : block_hash;
-  tip_height : block_height;
+  tip_height : nat32;
   next_page : opt blob;
 };
 
 type block_header = blob;
+type block_height = nat32;
 
 type get_block_headers_response = record {
   tip_height : block_height;
