@@ -16,22 +16,27 @@ export const fetchBalance = async (address) => {
 // Fetch blockchain statistics
 export const fetchBlockchainStats = async () => {
   try {
-    console.log("Fetching actor...");
+    console.log("Initializing actor...");
     const actor = useActor();
     if (!actor) {
-      throw new Error("Actor not initialized.");
+      throw new Error("Actor is not initialized.");
     }
     console.log("Actor initialized, calling get_blockchain_stats...");
+
     const result = await actor.get_blockchain_stats();
     console.log("Blockchain stats result:", result);
 
-    if ("Ok" in result) return result.Ok;
-    throw new Error(result.Err || "Failed to fetch blockchain stats");
+    if ("Ok" in result) {
+      return result.Ok;
+    } else {
+      throw new Error(result.Err || "Failed to fetch blockchain stats");
+    }
   } catch (error) {
-    console.error("Failed to fetch blockchain stats:", error);
-    throw new Error("Error fetching blockchain stats");
+    console.error("Error fetching blockchain stats:", error);
+    throw error;
   }
 };
+
 // Fetch the latest blocks
 export const fetchLatestBlocks = async () => {
   try {
