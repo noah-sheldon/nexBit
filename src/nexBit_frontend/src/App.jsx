@@ -7,7 +7,8 @@ import Dashboard from './pages/Dashboard';
 import Wallet from './pages/Wallet';
 
 function App() {
-  const { isAuthenticated } = useInternetIdentity();
+  const { identity } = useInternetIdentity();
+  const principal = identity?.getPrincipal();
 
   return (
     <Router>
@@ -15,11 +16,13 @@ function App() {
         <Navbar />
         <main className="p-6 md:p-12">
           <Routes>
+            {/* Dashboard accessible without identity */}
             <Route path="/" element={<Dashboard />} />
-            {isAuthenticated ? (
+            
+            {/* Wallet requires identity */}
+            {principal ? (
               <Route path="/wallet" element={<Wallet />} />
             ) : (
-              // Redirect to Dashboard if not authenticated
               <Route path="/wallet" element={<Navigate to="/" replace />} />
             )}
           </Routes>

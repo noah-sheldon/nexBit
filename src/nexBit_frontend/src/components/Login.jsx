@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { useInternetIdentity } from "ic-use-internet-identity";
+import { Button } from "@/components/ui/button";
 
-function Login({ onLoginSuccess, className }) {
-  const { login } = useInternetIdentity();
-  const [isLoading, setIsLoading] = useState(false);
+function Login({ onLoginSuccess }) {
+  const { login, loginStatus } = useInternetIdentity();
+
+  // Determine button state
+  const isLoggingIn = loginStatus === "logging-in";
+  const isLoggedIn = loginStatus === "success";
+  const disabled = isLoggingIn || isLoggedIn;
 
   const handleLogin = async () => {
-    setIsLoading(true);
     try {
       await login();
       if (onLoginSuccess) {
@@ -14,15 +18,19 @@ function Login({ onLoginSuccess, className }) {
       }
     } catch (error) {
       console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
-    <button onClick={handleLogin} className={className} disabled={isLoading}>
-      {isLoading ? "Logging in..." : "Login"}
-    </button>
+    <Button
+      onClick={handleLogin}
+      disabled={disabled}
+      variant="ghost"
+      className="flex items-center space-x-2"
+    >
+      <img src="/favicon.ico" alt="Login Icon" className="w-4 h-4" />
+      <span>{isLoggingIn ? "Logging in..." : "Login"}</span>
+    </Button>
   );
 }
 

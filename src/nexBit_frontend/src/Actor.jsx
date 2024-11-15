@@ -17,7 +17,7 @@ export default function Actors({ children }) {
     <ActorProvider
       canisterId={canisterId}
       context={actorContext}
-      identity={identity}
+      identity={identity || undefined}
       idlFactory={idlFactory}
     >
       {children}
