@@ -1,17 +1,21 @@
-// src/components/shared/Navbar.js
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import LoginButton from './LoginButton';
-import { fetchP2pkhAddress, login, initAuth } from '../services/bitcoinActor';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Login from "../components/Login";
+import Logout from "../components/dashboard/Logout";
+import { useInternetIdentity } from "ic-use-internet-identity";
+import { fetchP2pkhAddress } from "../services/bitcoinActor";
 
 function Navbar() {
+  const { isAuthenticated } = useInternetIdentity();
   const [address, setAddress] = useState(null);
 
-  const handleLogin = async () => {
-    await initAuth();
-    await login();
-    const userAddress = await fetchP2pkhAddress();
-    setAddress(userAddress);
+  const handleLoginSuccess = async () => {
+    try {
+      const userAddress = await fetchP2pkhAddress();
+      setAddress(userAddress);
+    } catch (error) {
+      console.error("Failed to fetch BTC address:", error);
+    }
   };
 
   return (
@@ -22,23 +26,22 @@ function Navbar() {
         </Link>
         <div className="flex space-x-6 items-center">
           <Link to="/" className="hover:text-white/80 px-3 py-2 rounded-lg transition">
-            Dashboard
+            Explorer
           </Link>
-          <Link to="/address" className="hover:text-white/80 px-3 py-2 rounded-lg transition">
-            Address Explorer
-          </Link>
-          <Link to="/block" className="hover:text-white/80 px-3 py-2 rounded-lg transition">
-            Block Explorer
-          </Link>
-          <Link to="/transaction" className="hover:text-white/80 px-3 py-2 rounded-lg transition">
-            Transaction Explorer
-          </Link>
-          {address ? (
-            <span className="bg-white/10 text-white px-4 py-2 rounded-lg font-medium max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
-              BTC Address: {address}
-            </span>
+          {isAuthenticated ? (
+            <>
+              {address && (
+                <span className="bg-white/10 text-white px-4 py-2 rounded-lg font-medium max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                  BTC Address: {address}
+                </span>
+              )}
+              <Logout className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-white/90 transition" />
+            </>
           ) : (
-            <LoginButton onLogin={handleLogin} className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-white/90 transition" />
+            <Login
+              onLoginSuccess={handleLoginSuccess}
+              className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-white/90 transition"
+            />
           )}
         </div>
       </div>

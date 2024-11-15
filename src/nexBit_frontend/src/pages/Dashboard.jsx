@@ -14,7 +14,7 @@ function Dashboard() {
         <div className="col-span-1 md:col-span-2">
           <NetworkStats />
         </div>
-        <div>
+        {/* <div>
           <FeePercentiles />
         </div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1">
@@ -22,7 +22,7 @@ function Dashboard() {
         </div>
         <div className="col-span-1 md:col-span-2 lg:col-span-1">
           <RecentTransactions />
-        </div>
+        </div> */}
       </div>
     </div>
   );

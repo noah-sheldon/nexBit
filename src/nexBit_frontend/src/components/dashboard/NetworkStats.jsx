@@ -1,4 +1,3 @@
-// src/components/dashboard/NetworkStatsComponent.jsx
 import React, { useEffect, useState } from 'react';
 import { fetchBlockchainStats } from '../../services/bitcoinActor';
 
@@ -9,9 +8,11 @@ function NetworkStats() {
   useEffect(() => {
     const loadStats = async () => {
       try {
+        console.log("Loading blockchain stats...");
         const data = await fetchBlockchainStats();
         setStats(data);
       } catch (err) {
+        console.error("Error loading stats:", err);
         setError(err.message);
       }
     };
