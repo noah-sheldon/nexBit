@@ -11,6 +11,7 @@ import {
 import { ClipboardCopy } from "lucide-react";
 import useP2pkhAddress from "../components/hooks/useP2pkhAddress";
 import { useToast } from "../hooks/use-toast";
+import { FaBitcoin } from "react-icons/fa";
 
 function Navbar() {
   const { data: address, isLoading, error, refetch } = useP2pkhAddress();
@@ -19,33 +20,49 @@ function Navbar() {
 
   const handleCopy = () => {
     if (address) {
-      navigator.clipboard.writeText(address).then(() => {
+      try {
+        const input = document.createElement("input");
+        input.style.position = "absolute";
+        input.style.left = "-9999px";
+        input.value = address;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand("copy");
+        document.body.removeChild(input);
+
         toast({
           title: "Copied!",
           description: "BTC address copied to clipboard.",
         });
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000); // Reset copy state
-      });
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        console.error("Failed to copy BTC address:", error);
+        toast({
+          title: "Error",
+          description: "Unable to copy BTC address.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   useEffect(() => {
-    refetch(); // Refetch address when the component mounts
+    refetch();
   }, []);
 
   return (
-    <nav className="bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 px-6 py-4 shadow-md text-white">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 px-6 py-4 shadow-md text-white">
       <div className="container mx-auto flex flex-wrap justify-between items-center">
         {/* Logo */}
         <Link
           to="/"
-          className="text-2xl font-extrabold tracking-tight text-white"
+          className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2"
         >
+          <FaBitcoin className="text-yellow-500" />
           nexBit
         </Link>
         <div className="flex flex-wrap items-center gap-4 mt-2 md:mt-0">
-          {/* Navigation Links */}
           <Button variant="link" asChild>
             <Link to="/" className="hover:text-white/80 transition">
               Explorer
@@ -58,7 +75,6 @@ function Navbar() {
               </Link>
             </Button>
           )}
-          {/* Address and Actions */}
           {address && !error ? (
             <>
               {isLoading ? (
@@ -67,10 +83,7 @@ function Navbar() {
                 </span>
               ) : (
                 <div className="flex items-center bg-white/10 text-white px-4 py-2 rounded-lg">
-                  <span
-                    className="truncate max-w-xs text-sm"
-                    title={address} // Show full address on hover
-                  >
+                  <span className="truncate max-w-xs text-sm" title={address}>
                     BTC: {address}
                   </span>
                   <Tooltip>
