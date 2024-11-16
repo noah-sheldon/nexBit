@@ -13,6 +13,7 @@ process.env.II_URL =
     : `https://identity.ic0.app`;
 
 export default defineConfig({
+  publicDir: "public", 
   build: {
     emptyOutDir: true,
   },

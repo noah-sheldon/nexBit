@@ -1,83 +1,98 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Login from "../components/Login";
 import Logout from "../components/Logout";
-import { useInternetIdentity } from "ic-use-internet-identity";
-import { fetchP2pkhAddress } from "../services/bitcoinActor";
+import { Button } from "../components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../components/ui/tooltip";
+import { ClipboardCopy } from "lucide-react";
+import useP2pkhAddress from "../components/hooks/useP2pkhAddress";
+import { useToast } from "../hooks/use-toast";
 
 function Navbar() {
-  const { identity } = useInternetIdentity();
-  const principal = identity?.getPrincipal();
-  const [address, setAddress] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { data: address, isLoading, error, refetch } = useP2pkhAddress();
+  const { toast } = useToast();
+  const [copied, setCopied] = React.useState(false);
 
-  useEffect(() => {
-    if (principal && !address) {
-      handleFetchAddress();
-    }
-  }, [principal]);
-
-  const handleFetchAddress = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const cachedAddress = localStorage.getItem(`btcAddress-${principal}`);
-      if (cachedAddress) {
-        setAddress(cachedAddress);
-        setLoading(false);
-        return;
-      }
-
-      const userAddress = await fetchP2pkhAddress();
-      setAddress(userAddress);
-      localStorage.setItem(`btcAddress-${principal}`, userAddress);
-    } catch (err) {
-      setError("Failed to fetch BTC address.");
-      console.error("Error fetching BTC address:", err);
-    } finally {
-      setLoading(false);
+  const handleCopy = () => {
+    if (address) {
+      navigator.clipboard.writeText(address).then(() => {
+        toast({
+          title: "Copied!",
+          description: "BTC address copied to clipboard.",
+        });
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000); // Reset copy state
+      });
     }
   };
 
+  useEffect(() => {
+    refetch(); // Refetch address when the component mounts
+  }, []);
+
   return (
-    <nav className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-6 py-4 shadow-md text-white">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold tracking-tight text-white">
+    <nav className="bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 px-6 py-4 shadow-md text-white">
+      <div className="container mx-auto flex flex-wrap justify-between items-center">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="text-2xl font-extrabold tracking-tight text-white"
+        >
           nexBit
         </Link>
-        <div className="flex space-x-6 items-center">
-          <Link
-            to="/"
-            className="hover:text-white/80 px-3 py-2 rounded-lg transition"
-          >
-            Explorer
-          </Link>
-          {principal ? (
+        <div className="flex flex-wrap items-center gap-4 mt-2 md:mt-0">
+          {/* Navigation Links */}
+          <Button variant="link" asChild>
+            <Link to="/" className="hover:text-white/80 transition">
+              Explorer
+            </Link>
+          </Button>
+          {address && !error && (
+            <Button variant="link" asChild>
+              <Link to="/wallet" className="hover:text-white/80 transition">
+                Wallet
+              </Link>
+            </Button>
+          )}
+          {/* Address and Actions */}
+          {address && !error ? (
             <>
-              {loading ? (
-                <span className="bg-white/10 text-white px-4 py-2 rounded-lg font-medium">
+              {isLoading ? (
+                <span className="text-sm text-gray-300">
                   Fetching BTC Address...
                 </span>
-              ) : error ? (
-                <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium">
-                  {error}
-                </span>
               ) : (
-                address && (
-                  <span className="bg-white/10 text-white px-4 py-2 rounded-lg font-medium max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
-                    BTC Address: {address}
+                <div className="flex items-center bg-white/10 text-white px-4 py-2 rounded-lg">
+                  <span
+                    className="truncate max-w-xs text-sm"
+                    title={address} // Show full address on hover
+                  >
+                    BTC: {address}
                   </span>
-                )
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={handleCopy}
+                        className="ml-2 p-2 bg-white/20 rounded-full hover:bg-white/30 transition"
+                        aria-label="Copy BTC Address"
+                      >
+                        <ClipboardCopy className="w-5 h-5 text-white" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>{copied ? "Copied!" : "Copy BTC Address"}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               )}
-              <Logout className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-white/90 transition" />
+              <Logout className="ml-4" />
             </>
           ) : (
-            <Login
-              onLoginSuccess={handleFetchAddress}
-              className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-white/90 transition"
-            />
+            <Login onLoginSuccess={() => refetch()} />
           )}
         </div>
       </div>
