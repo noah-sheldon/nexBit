@@ -3,6 +3,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { FaBitcoin } from "react-icons/fa"; // Bitcoin Icon
 import useP2pkhAddress from "../hooks/useP2pkhAddress";
 import useFeePercentiles from "../hooks/useFeePercentiles";
 import useBalance from "../hooks/useBalance";
@@ -31,12 +40,22 @@ function Explorer() {
   const tipBlockHash = utxoData?.tip_block_hash || "-";
   const tipHeight = utxoData?.tip_height?.toString() || "-";
 
+  // Decode txid (Uint8Array) to a hexadecimal string
+  const decodeTxid = (txid) => {
+    return Array.from(txid)
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  };
+
+  // Helper Function: Convert Sats to BTC
+  const satsToBTC = (sats) => (sats / 1e8).toFixed(8);
+
   return (
     <Card className="p-6 space-y-6">
       {/* Search Section */}
       <CardHeader>
-        <CardTitle className="text-xl font-bold">
-          Search Bitcoin Address
+        <CardTitle className="text-xl font-bold flex items-center gap-2">
+          <FaBitcoin className="text-yellow-500" /> Search Bitcoin Address
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -49,6 +68,7 @@ function Explorer() {
           <Button
             onClick={() => setSearchAddress(manualAddress)}
             disabled={!manualAddress}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black"
           >
             Search
           </Button>
@@ -58,7 +78,9 @@ function Explorer() {
       {/* Address Section */}
       <CardContent>
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Current Address</h2>
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FaBitcoin className="text-yellow-500" /> Current Address
+          </h2>
           {isLoadingAddress ? (
             <Skeleton className="h-6 w-full" />
           ) : (
@@ -72,38 +94,16 @@ function Explorer() {
       {/* Balance Section */}
       <CardContent>
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Balance</h2>
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FaBitcoin className="text-yellow-500" /> Balance
+          </h2>
           {isLoadingBalance ? (
             <Skeleton className="h-6 w-full" />
           ) : balance !== null && balance !== undefined ? (
-            <div className="text-lg font-medium text-gray-200">
-              {`${balance.toLocaleString()} sats`}
+            <div className="text-lg font-medium text-gray-200 flex items-center gap-2">
+              <span>{`${satsToBTC(balance)} BTC`}</span>
+              <span className="text-sm text-gray-400">{`(${balance.toLocaleString()} sats)`}</span>
             </div>
-          ) : (
-            "-"
-          )}
-        </div>
-      </CardContent>
-
-      {/* Fee Percentiles Section */}
-      <CardContent>
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Fee Percentiles</h2>
-          {isLoadingFees ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, idx) => (
-                <Skeleton key={idx} className="h-6 w-full" />
-              ))}
-            </div>
-          ) : feePercentiles && feePercentiles.length > 0 ? (
-            <ul className="space-y-2 text-gray-300">
-              {feePercentiles.map((fee, idx) => (
-                <li key={idx} className="flex justify-between">
-                  <span>Percentile {idx + 1}:</span>
-                  <span>{fee.toLocaleString()} msats/byte</span>
-                </li>
-              ))}
-            </ul>
           ) : (
             <div className="text-gray-500">-</div>
           )}
@@ -112,46 +112,47 @@ function Explorer() {
 
       {/* UTXOs Section */}
       <CardContent>
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">UTXOs</h2>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FaBitcoin className="text-yellow-500" /> UTXOs
+          </h2>
           {isLoadingUTXOs ? (
-            <div className="space-y-2">
-              {[...Array(3)].map((_, idx) => (
-                <Skeleton key={idx} className="h-6 w-full" />
-              ))}
-            </div>
-          ) : utxos && utxos.length > 0 ? (
-            <div className="space-y-4">
-              <div className="space-y-1 text-gray-300">
+            <Skeleton className="h-6 w-full" />
+          ) : utxos.length > 0 ? (
+            <div>
+              {/* <div className="mb-4 text-gray-300">
                 <div>
-                  <strong>Tip Block Hash:</strong> {tipBlockHash}
+                  <strong>Tip Block Hash:</strong> {decodeTxid(tipBlockHash)}
                 </div>
                 <div>
                   <strong>Tip Height:</strong> {tipHeight}
                 </div>
-              </div>
-              <ul className="space-y-4">
-                {utxos.map((utxo, idx) => (
-                  <li
-                    key={idx}
-                    className="flex flex-col gap-2 p-4 rounded-md bg-gray-800"
-                  >
-                    <div className="flex justify-between">
-                      <span>Tx ID:</span>
-                      <span className="truncate max-w-[200px]">
-                        {utxo.outpoint.txid.toString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Value:</span>
-                      <span>{utxo.value.toLocaleString()} sats</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              </div> */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tx ID</TableHead>
+                    <TableHead>Height</TableHead>
+                    <TableHead>Value (BTC)</TableHead>
+                    <TableHead>Output Index</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {utxos.slice(0, 10).map((utxo, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell className="truncate max-w-[150px]">
+                        {decodeTxid(utxo.outpoint.txid)}
+                      </TableCell>
+                      <TableCell>{utxo.height}</TableCell>
+                      <TableCell>{satsToBTC(parseInt(utxo.value))}</TableCell>
+                      <TableCell>{utxo.outpoint.vout}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : (
-            <div className="text-gray-500">-</div>
+            <div className="text-gray-500">No UTXOs available.</div>
           )}
         </div>
       </CardContent>

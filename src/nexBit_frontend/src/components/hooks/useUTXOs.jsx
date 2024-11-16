@@ -12,7 +12,17 @@ export default function useUTXOs(address) {
 
       console.log("Fetching UTXOs for address:", address);
       const utxoResponse = await actor.get_utxos(address);
-      return utxoResponse.utxos;
+      console.log("Fetched UTXOs:", utxoResponse);
+
+      if (utxoResponse && utxoResponse.utxos) {
+        return {
+          utxos: utxoResponse.utxos,
+          tipBlockHash: utxoResponse.tip_block_hash.toString(),
+          tipHeight: utxoResponse.tip_height,
+          nextPage: utxoResponse.next_page,
+        };
+      }
+      throw new Error("Failed to fetch UTXOs.");
     },
     enabled: !!actor && !!address, // Fetch only when actor and address are available
     onError: (error) => {
