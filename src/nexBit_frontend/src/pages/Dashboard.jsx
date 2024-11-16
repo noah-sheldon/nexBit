@@ -1,8 +1,9 @@
 import React from "react";
 import RecentBlocks from "../components/dashboard/RecentBlocks";
 import NetworkStats from "../components/dashboard/NetworkStats";
-import FeePercentiles from "../components/dashboard/FeePercentiles";
 import RecentTransactions from "../components/dashboard/RecentTransactions";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Explorer from "../components/dashboard/Explorer"; // New Explorer tab content
 
 function Dashboard() {
   return (
@@ -10,26 +11,27 @@ function Dashboard() {
       <div className="max-w-screen-lg w-full space-y-6">
         <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
 
-        {/* Network Stats */}
-        <NetworkStats />
+        {/* Tabs for Dashboard Sections */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="mb-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="explorer">Explorer</TabsTrigger>
+          </TabsList>
 
-        {/* Fee Percentiles */}
-        {/* <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">
-              Fee Percentiles
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FeePercentiles />
-          </CardContent>
-        </Card> */}
+          {/* Overview Tab */}
+          <TabsContent value="overview">
+            <div className="space-y-6">
+              <NetworkStats />
+              <RecentBlocks />
+              <RecentTransactions />
+            </div>
+          </TabsContent>
 
-        {/* Recent Blocks */}
-        <RecentBlocks />
-
-        {/* Recent Transactions */}
-        <RecentTransactions />
+          {/* Explorer Tab */}
+          <TabsContent value="explorer">
+            <Explorer />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
