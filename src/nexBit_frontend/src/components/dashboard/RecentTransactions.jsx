@@ -1,41 +1,66 @@
-// src/components/dashboard/RecentTransactionsComponent.jsx
-import React, { useEffect, useState } from 'react';
-import { fetchLatestTransactions } from '../../services/bitcoinActor';
+import React from "react";
+import useLatestTransactions from "../hooks/useLatestTransactions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"; // ShadCN Table
+import { Skeleton } from "@/components/ui/skeleton";
 
 function RecentTransactions() {
-  const [transactions, setTransactions] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const loadTransactions = async () => {
-      try {
-        const data = await fetchLatestTransactions();
-        setTransactions(data);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-    loadTransactions();
-  }, []);
-
-  if (error) return <p>Error: {error}</p>;
-  if (!transactions.length) return <p>Loading...</p>;
+  const { data: transactions, isLoading } = useLatestTransactions();
 
   return (
-    <div className="p-4 bg-white shadow rounded-md">
-      <h2 className="text-lg font-bold mb-4">Recent Transactions</h2>
-      <ul>
-        {transactions.slice(0, 10).map((tx) => (
-          <li key={tx.txid} className="border-b border-gray-200 py-2">
-            <p><strong>Transaction ID:</strong> {tx.txid}</p>
-            <p><strong>Time:</strong> {tx.time}</p>
-            <p><strong>Input Total (USD):</strong> ${tx.input_total_usd.toFixed(2)}</p>
-            <p><strong>Output Total (USD):</strong> ${tx.output_total_usd.toFixed(2)}</p>
-            <p><strong>Fee (USD):</strong> ${tx.fee_usd.toFixed(2)}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Card className="p-4">
+      <CardHeader>
+        <CardTitle className="text-lg font-semibold">
+          Recent Transactions
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          // Show Skeleton during loading state
+          <div className="space-y-4">
+            {[...Array(5)].map((_, idx) => (
+              <Skeleton key={idx} className="h-6 w-full" />
+            ))}
+          </div>
+        ) : transactions && transactions.length > 0 ? (
+          // Render Table with Transactions
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Transaction ID</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Input (USD)</TableHead>
+                <TableHead>Output (USD)</TableHead>
+                <TableHead>Fee (USD)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {transactions.slice(0, 10).map((tx) => (
+                <TableRow key={tx.txid}>
+                  <TableCell className="truncate max-w-[150px]">
+                    {tx.txid}
+                  </TableCell>
+                  <TableCell>{tx.time}</TableCell>
+                  <TableCell>${tx.input_total_usd.toFixed(2)}</TableCell>
+                  <TableCell>${tx.output_total_usd.toFixed(2)}</TableCell>
+                  <TableCell>${tx.fee_usd.toFixed(2)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          // Handle the case where no transactions are available
+          <p className="text-gray-500">No recent transactions available.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

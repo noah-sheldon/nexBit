@@ -3,12 +3,6 @@ import RecentBlocks from "../components/dashboard/RecentBlocks";
 import NetworkStats from "../components/dashboard/NetworkStats";
 import FeePercentiles from "../components/dashboard/FeePercentiles";
 import RecentTransactions from "../components/dashboard/RecentTransactions";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardTitle,
-} from "../components/ui/card"; // ShadCN Card components
 
 function Dashboard() {
   return (
@@ -35,16 +29,7 @@ function Dashboard() {
         <RecentBlocks />
 
         {/* Recent Transactions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">
-              Recent Transactions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RecentTransactions />
-          </CardContent>
-        </Card>
+        <RecentTransactions />
       </div>
     </div>
   );
