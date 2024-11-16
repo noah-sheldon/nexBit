@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Explorer from "../components/dashboard/Explorer";
 import { FaBitcoin } from "react-icons/fa";
 
-function Dashboard() {
+function Dashboard({ canisterId }) {
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white flex justify-center">
       <div className="max-w-screen-lg w-full space-y-6">

@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
-function Wallet() {
-  return (
-    <div>Wallet</div>
-  )
+function Wallet({ canisterId }) {
+  return <div>Wallet</div>;
 }
 
-export default Wallet
+export default Wallet;

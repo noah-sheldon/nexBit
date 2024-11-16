@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import Login from "../components/Login";
 import Logout from "../components/Logout";
 import { Button } from "../components/ui/button";
@@ -13,10 +12,10 @@ import useP2pkhAddress from "../components/hooks/useP2pkhAddress";
 import { useToast } from "../hooks/use-toast";
 import { FaBitcoin } from "react-icons/fa";
 
-function Navbar() {
+function Navbar({ navigate, canisterId }) {
   const { data: address, isLoading, error, refetch } = useP2pkhAddress();
   const { toast } = useToast();
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     if (address) {
@@ -55,26 +54,36 @@ function Navbar() {
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 px-6 py-4 shadow-md text-white">
       <div className="container mx-auto flex flex-wrap justify-between items-center">
         {/* Logo */}
-        <Link
-          to="/"
+        <button
+          onClick={() => navigate("/", { canisterId })}
           className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2"
         >
           <FaBitcoin className="text-yellow-500" />
           nexBit
-        </Link>
+        </button>
+
+        {/* Navigation Links */}
         <div className="flex flex-wrap items-center gap-4 mt-2 md:mt-0">
           <Button variant="link" asChild>
-            <Link to="/" className="hover:text-white/80 transition">
+            <button
+              onClick={() => navigate("/", { canisterId })}
+              className="hover:text-white/80 transition"
+            >
               Explorer
-            </Link>
+            </button>
           </Button>
           {address && !error && (
             <Button variant="link" asChild>
-              <Link to="/wallet" className="hover:text-white/80 transition">
+              <button
+                onClick={() => navigate("/wallet", { canisterId })}
+                className="hover:text-white/80 transition"
+              >
                 Wallet
-              </Link>
+              </button>
             </Button>
           )}
+
+          {/* BTC Address and Actions */}
           {address && !error ? (
             <>
               {isLoading ? (
@@ -83,14 +92,18 @@ function Navbar() {
                 </span>
               ) : (
                 <div className="flex items-center bg-white/10 text-white px-4 py-2 rounded-lg">
-                  <span className="truncate max-w-xs text-sm" title={address}>
+                  <span
+                    className="truncate max-w-xs text-sm"
+                    title={address}
+                    style={{ maxWidth: "150px" }}
+                  >
                     BTC: {address}
                   </span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         onClick={handleCopy}
-                        className="ml-2 p-2 bg-white/20 rounded-full hover:bg-white/30 transition"
+                        className="ml-2 p-2 bg-white/20 rounded-full hover:bg-white/30 transition focus:ring focus:ring-yellow-400"
                         aria-label="Copy BTC Address"
                       >
                         <ClipboardCopy className="w-5 h-5 text-white" />
