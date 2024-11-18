@@ -1,7 +1,7 @@
 import React from "react";
 import { useInternetIdentity } from "ic-use-internet-identity";
 import { Button } from "../components/ui/button";
-import { useToast } from "../hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 function Logout({ className }) {
   const { clear } = useInternetIdentity();

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useActor } from "../../Actor"; // Import the actor context for backend calls
+import { useActor } from "../Actor"; // Import the actor context for backend calls
 
 export default function useLatestTransactions() {
   const { actor } = useActor();

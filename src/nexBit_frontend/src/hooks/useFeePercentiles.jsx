@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useActor } from "../../Actor";
+import { useActor } from "../Actor";
 
 export default function useFeePercentiles() {
   const { actor } = useActor();

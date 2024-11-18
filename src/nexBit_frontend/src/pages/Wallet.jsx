@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useBalance from "../components/hooks/useBalance";
+import useBalance from "@/hooks/useBalance";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,7 +24,9 @@ const Wallet = () => {
       <div className="max-w-lg mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-center text-3xl">Your Wallet</CardTitle>
+            <CardTitle className="text-center text-3xl">
+              nexBit Wallet
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             {/* Display BTC Balance */}

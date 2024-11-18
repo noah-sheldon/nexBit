@@ -1,4 +1,4 @@
-import { useActor } from "../../Actor";
+import { useActor } from "../Actor";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useBlockchainStats() {

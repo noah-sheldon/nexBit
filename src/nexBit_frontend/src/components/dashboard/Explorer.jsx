@@ -12,10 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FaBitcoin } from "react-icons/fa"; // Bitcoin Icon
-import useP2pkhAddress from "../hooks/useP2pkhAddress";
-import useFeePercentiles from "../hooks/useFeePercentiles";
-import useBalance from "../hooks/useBalance";
-import useUTXOs from "../hooks/useUTXOs";
+import useP2pkhAddress from "@/hooks/useP2pkhAddress";
+import useFeePercentiles from "@/hooks/useFeePercentiles";
+import useBalance from "@/hooks/useBalance";
+import useUTXOs from "@/hooks/useUTXOs";
 
 function Explorer() {
   const [manualAddress, setManualAddress] = useState("");
@@ -31,10 +31,18 @@ function Explorer() {
     useFeePercentiles();
 
   // Fetch Balance
-  const { data: balance, isLoading: isLoadingBalance } = useBalance(address);
+  const {
+    data: balance,
+    isLoading: isLoadingBalance,
+    error: balanceError,
+  } = useBalance(address);
 
   // Fetch UTXOs
-  const { data: utxoData, isLoading: isLoadingUTXOs } = useUTXOs(address);
+  const {
+    data: utxoData,
+    isLoading: isLoadingUTXOs,
+    error: utxoError,
+  } = useUTXOs(address);
 
   const utxos = utxoData?.utxos || [];
   const tipBlockHash = utxoData?.tip_block_hash || "-";
@@ -51,10 +59,10 @@ function Explorer() {
   const satsToBTC = (sats) => (sats / 1e8).toFixed(8);
 
   return (
-    <Card className="p-6 space-y-6">
+    <Card className="p-6 space-y-6 bg-gray-900 text-gray-300 rounded-lg shadow-md">
       {/* Search Section */}
       <CardHeader>
-        <CardTitle className="text-xl font-bold flex items-center gap-2">
+        <CardTitle className="text-xl font-bold flex items-center gap-2 text-white">
           <FaBitcoin className="text-yellow-500" /> Search Bitcoin Address
         </CardTitle>
       </CardHeader>
@@ -64,6 +72,7 @@ function Explorer() {
             placeholder="Enter Bitcoin Address"
             value={manualAddress}
             onChange={(e) => setManualAddress(e.target.value)}
+            className="bg-gray-800 text-gray-300"
           />
           <Button
             onClick={() => setSearchAddress(manualAddress)}
@@ -82,7 +91,7 @@ function Explorer() {
             <FaBitcoin className="text-yellow-500" /> Current Address
           </h2>
           {isLoadingAddress ? (
-            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full bg-gray-700" />
           ) : (
             <div className="text-lg font-medium text-gray-200">
               {address || "-"}
@@ -98,7 +107,9 @@ function Explorer() {
             <FaBitcoin className="text-yellow-500" /> Balance
           </h2>
           {isLoadingBalance ? (
-            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full bg-gray-700" />
+          ) : balanceError ? (
+            <div className="text-red-500">Error fetching balance.</div>
           ) : balance !== null && balance !== undefined ? (
             <div className="text-lg font-medium text-gray-200 flex items-center gap-2">
               <span>{`${satsToBTC(balance)} BTC`}</span>
@@ -117,40 +128,44 @@ function Explorer() {
             <FaBitcoin className="text-yellow-500" /> UTXOs
           </h2>
           {isLoadingUTXOs ? (
-            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full bg-gray-700" />
+          ) : utxoError ? (
+            <div className="text-red-500">Error fetching UTXOs.</div>
           ) : utxos.length > 0 ? (
-            <div>
-              {/* <div className="mb-4 text-gray-300">
-                <div>
-                  <strong>Tip Block Hash:</strong> {decodeTxid(tipBlockHash)}
-                </div>
-                <div>
-                  <strong>Tip Height:</strong> {tipHeight}
-                </div>
-              </div> */}
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tx ID</TableHead>
-                    <TableHead>Height</TableHead>
-                    <TableHead>Value (BTC)</TableHead>
-                    <TableHead>Output Index</TableHead>
+            <Table className="w-full border-collapse border border-gray-700">
+              <TableHeader className="bg-gray-800">
+                <TableRow>
+                  <TableHead className="py-2 px-4 text-left text-gray-400">
+                    Tx ID
+                  </TableHead>
+                  <TableHead className="py-2 px-4 text-left text-gray-400">
+                    Height
+                  </TableHead>
+                  <TableHead className="py-2 px-4 text-left text-gray-400">
+                    Value (BTC)
+                  </TableHead>
+                  <TableHead className="py-2 px-4 text-left text-gray-400">
+                    Output Index
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {utxos.slice(0, 10).map((utxo, idx) => (
+                  <TableRow key={idx} className="hover:bg-gray-700">
+                    <TableCell className="truncate max-w-[150px] py-2 px-4">
+                      {decodeTxid(utxo.outpoint.txid)}
+                    </TableCell>
+                    <TableCell className="py-2 px-4">{utxo.height}</TableCell>
+                    <TableCell className="py-2 px-4">
+                      {satsToBTC(parseInt(utxo.value))}
+                    </TableCell>
+                    <TableCell className="py-2 px-4">
+                      {utxo.outpoint.vout}
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {utxos.slice(0, 10).map((utxo, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell className="truncate max-w-[150px]">
-                        {decodeTxid(utxo.outpoint.txid)}
-                      </TableCell>
-                      <TableCell>{utxo.height}</TableCell>
-                      <TableCell>{satsToBTC(parseInt(utxo.value))}</TableCell>
-                      <TableCell>{utxo.outpoint.vout}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
             <div className="text-gray-500">No UTXOs available.</div>
           )}

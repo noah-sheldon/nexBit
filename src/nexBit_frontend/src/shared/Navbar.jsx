@@ -8,8 +8,8 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import { ClipboardCopy } from "lucide-react";
-import useP2pkhAddress from "../components/hooks/useP2pkhAddress";
-import { useToast } from "../hooks/use-toast";
+import useP2pkhAddress from "@/hooks/useP2pkhAddress";
+import { useToast } from "@/hooks/use-toast";
 import { FaBitcoin } from "react-icons/fa";
 
 function Navbar({ navigate, canisterId }) {
@@ -67,7 +67,7 @@ function Navbar({ navigate, canisterId }) {
           <Button variant="link" asChild>
             <button
               onClick={() => navigate("/", { canisterId })}
-              className="hover:text-white/80 transition"
+              className="hover:text-black/80 transition text-white"
             >
               Explorer
             </button>
@@ -76,7 +76,7 @@ function Navbar({ navigate, canisterId }) {
             <Button variant="link" asChild>
               <button
                 onClick={() => navigate("/wallet", { canisterId })}
-                className="hover:text-white/80 transition"
+                className="hover:text-black/80 transition text-white"
               >
                 Wallet
               </button>

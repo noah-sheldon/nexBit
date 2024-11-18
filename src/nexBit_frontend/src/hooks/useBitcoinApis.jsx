@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useActor } from "../../Actor";
+import { useActor } from "../Actor";
 
 export default function useBitcoinAPIs() {
   const { actor } = useActor();

@@ -1,5 +1,5 @@
 import React from "react";
-import useLatestBlocks from "../hooks/useLatestBlocks";
+import useLatestBlocks from "@/hooks/useLatestBlocks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -15,40 +15,63 @@ function RecentBlocks() {
   const { data: blocks, isLoading, error } = useLatestBlocks();
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 bg-gray-900 text-gray-300 rounded-lg shadow-md">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Recent Blocks</CardTitle>
+        <CardTitle className="text-lg font-semibold text-white">
+          Recent Blocks
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {/* Show Skeleton during Loading */}
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, idx) => (
-              <Skeleton key={idx} className="h-6 w-full" />
+              <Skeleton key={idx} className="h-6 w-full bg-gray-700" />
             ))}
           </div>
         ) : error ? (
           <p className="text-red-500">Failed to fetch recent blocks.</p>
         ) : blocks && blocks.length > 0 ? (
           // Render Table with Data
-          <Table>
-            <TableHeader>
+          <Table className="w-full border-collapse border border-gray-700">
+            <TableHeader className="bg-gray-800">
               <TableRow>
-                <TableHead>Height</TableHead>
-                <TableHead>Transactions</TableHead>
-                <TableHead>Size (bytes)</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Difficulty</TableHead>
+                <TableHead className="py-2 px-4 text-left text-gray-400">
+                  Height
+                </TableHead>
+                <TableHead className="py-2 px-4 text-left text-gray-400">
+                  Transactions
+                </TableHead>
+                <TableHead className="py-2 px-4 text-left text-gray-400">
+                  Size (bytes)
+                </TableHead>
+                <TableHead className="py-2 px-4 text-left text-gray-400">
+                  Date
+                </TableHead>
+                <TableHead className="py-2 px-4 text-left text-gray-400">
+                  Difficulty
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {blocks.map((block) => (
-                <TableRow key={block.block_height}>
-                  <TableCell>{block.block_height.toString()}</TableCell>
-                  <TableCell>{block.transaction_count.toString()}</TableCell>
-                  <TableCell>{block.block_size.toString()}</TableCell>
-                  <TableCell>{block.date}</TableCell>
-                  <TableCell>{block.difficulty.toFixed(2)}</TableCell>
+                <TableRow
+                  key={block.block_height}
+                  className="hover:bg-gray-700"
+                >
+                  <TableCell className="py-2 px-4">
+                    {block.block_height.toString()}
+                  </TableCell>
+                  <TableCell className="py-2 px-4">
+                    {block.transaction_count.toString()}
+                  </TableCell>
+                  <TableCell className="py-2 px-4">
+                    {block.block_size.toString()}
+                  </TableCell>
+                  <TableCell className="py-2 px-4">{block.date}</TableCell>
+                  <TableCell className="py-2 px-4">
+                    {block.difficulty.toExponential(2)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

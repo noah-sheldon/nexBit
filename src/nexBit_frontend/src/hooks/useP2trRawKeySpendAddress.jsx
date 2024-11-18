@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getActor } from "../../Actor";
+import { getActor } from "../Actor";
 
 export default function useP2trRawKeySpendAddress() {
   const actor = getActor();
