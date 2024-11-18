@@ -3,6 +3,7 @@ import { useInternetIdentity } from "ic-use-internet-identity";
 import Navbar from "./shared/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Wallet from "./pages/Wallet";
+import Login from "./pages/Login";
 import { Toaster } from "./components/ui/toaster";
 
 const App = () => {
@@ -41,13 +42,16 @@ const App = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const currentCanisterId = searchParams.get("canisterId") || canisterId;
 
+    if (!principal) {
+      // Redirect unauthenticated users to Login page
+      return <Login />;
+    }
+
     switch (currentPath) {
       case "/wallet":
-        return principal ? (
-          <Wallet canisterId={currentCanisterId} />
-        ) : (
-          <Dashboard canisterId={currentCanisterId} />
-        );
+        return <Wallet canisterId={currentCanisterId} />;
+      case "/":
+        return <Dashboard canisterId={currentCanisterId} />;
       default:
         return <Dashboard canisterId={currentCanisterId} />;
     }
@@ -56,7 +60,11 @@ const App = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white">
       {/* Navbar */}
-      <Navbar navigate={navigate} canisterId={canisterId} />
+      <Navbar
+        navigate={navigate}
+        canisterId={canisterId}
+        isAuthenticated={!!principal}
+      />
 
       {/* Main content area */}
       <main className="flex-grow p-6 md:p-12">{renderPage()}</main>

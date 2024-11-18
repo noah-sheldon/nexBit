@@ -1,19 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Login from "../components/Login";
 import Logout from "../components/Logout";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "../components/ui/tooltip";
+} from "@/components/ui/tooltip";
 import { ClipboardCopy } from "lucide-react";
+import { FaBitcoin } from "react-icons/fa";
 import useP2pkhAddress from "@/hooks/useP2pkhAddress";
 import { useToast } from "@/hooks/use-toast";
-import { FaBitcoin } from "react-icons/fa";
+import { useInternetIdentity } from "ic-use-internet-identity";
 
-function Navbar({ navigate, canisterId }) {
-  const { data: address, isLoading, error, refetch } = useP2pkhAddress();
+const Navbar = ({ navigate, canisterId }) => {
+  const { identity } = useInternetIdentity();
+  const principal = identity?.getPrincipal(); // Determine if the user is logged in
+  const isAuthenticated = !!principal;
+
+  const { data: address, isLoading, error } = useP2pkhAddress();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
 
@@ -36,7 +41,6 @@ function Navbar({ navigate, canisterId }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch (error) {
-        console.error("Failed to copy BTC address:", error);
         toast({
           title: "Error",
           description: "Unable to copy BTC address.",
@@ -45,10 +49,6 @@ function Navbar({ navigate, canisterId }) {
       }
     }
   };
-
-  useEffect(() => {
-    refetch();
-  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 px-6 py-4 shadow-md text-white">
@@ -64,33 +64,30 @@ function Navbar({ navigate, canisterId }) {
 
         {/* Navigation Links */}
         <div className="flex flex-wrap items-center gap-4 mt-2 md:mt-0">
-          <Button variant="link" asChild>
-            <button
-              onClick={() => navigate("/", { canisterId })}
-              className="hover:text-black/80 transition text-white"
-            >
-              Explorer
-            </button>
-          </Button>
-          {address && !error && (
-            <Button variant="link" asChild>
-              <button
-                onClick={() => navigate("/wallet", { canisterId })}
-                className="hover:text-black/80 transition text-white"
-              >
-                Wallet
-              </button>
-            </Button>
-          )}
-
-          {/* BTC Address and Actions */}
-          {address && !error ? (
+          {isAuthenticated && (
             <>
-              {isLoading ? (
-                <span className="text-sm text-gray-300">
-                  Fetching BTC Address...
-                </span>
-              ) : (
+              {/* Explorer Link */}
+              <Button variant="link" asChild>
+                <button
+                  onClick={() => navigate("/", { canisterId })}
+                  className="hover:text-black/80 transition text-white"
+                >
+                  Explorer
+                </button>
+              </Button>
+
+              {/* Wallet Link */}
+              <Button variant="link" asChild>
+                <button
+                  onClick={() => navigate("/wallet", { canisterId })}
+                  className="hover:text-black/80 transition text-white"
+                >
+                  Wallet
+                </button>
+              </Button>
+
+              {/* BTC Address Copy */}
+              {address && !error && (
                 <div className="flex items-center bg-white/10 text-white px-4 py-2 rounded-lg">
                   <span
                     className="truncate max-w-xs text-sm"
@@ -115,15 +112,18 @@ function Navbar({ navigate, canisterId }) {
                   </Tooltip>
                 </div>
               )}
+
+              {/* Logout Button */}
               <Logout className="ml-4" />
             </>
-          ) : (
-            <Login onLoginSuccess={() => refetch()} />
           )}
+
+          {/* Login Button */}
+          {!isAuthenticated && <Login />}
         </div>
       </div>
     </nav>
   );
-}
+};
 
 export default Navbar;
