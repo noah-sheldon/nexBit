@@ -41,3 +41,4 @@ bitcoin-27.0
 # rust
 target/
 package-lock.json
+Cargo.lock

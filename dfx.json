@@ -32,24 +32,23 @@
     "nexBit_frontend": {
       "dependencies": ["basic_bitcoin"],
       "source": ["src/nexBit_frontend/dist"],
-      "type": "assets",
-      "workspace": "nexBit_frontend"
-    }
-  },
-  "networks": {
-    "local": {
-      "bind": "127.0.0.1:4943"
+      "type": "assets"
     }
   },
   "defaults": {
     "bitcoin": {
       "enabled": true,
-      "log_level": "info",
-      "nodes": ["127.0.0.1:18444"]
+      "nodes": ["127.0.0.1:18444"],
+      "log_level": "info"
     },
     "build": {
-      "args": "",
-      "packtool": ""
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943"
     }
   },
   "output_env_file": ".env",
