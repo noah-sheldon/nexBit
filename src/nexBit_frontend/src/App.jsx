@@ -42,13 +42,12 @@ const App = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const currentCanisterId = searchParams.get("canisterId") || canisterId;
 
-    if (!principal) {
-      // Redirect unauthenticated users to Login page
-      return <Login />;
-    }
-
     switch (currentPath) {
       case "/wallet":
+        // Require login for the Wallet page
+        if (!principal) {
+          return <Login />;
+        }
         return <Wallet canisterId={currentCanisterId} />;
       case "/":
         return <Dashboard canisterId={currentCanisterId} />;
