@@ -1,0 +1,58 @@
+{
+  "canisters": {
+    "basic_bitcoin": {
+      "type": "custom",
+      "package": "basic_bitcoin",
+      "candid": "src/basic_bitcoin/basic_bitcoin.did",
+      "wasm": "target/wasm32-unknown-unknown/release/basic_bitcoin.wasm",
+      "build": "src/basic_bitcoin/build.sh",
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
+    },
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
+      "networks": {
+        "local": {
+          "bind": "127.0.0.1:8000",
+          "type": "ephemeral"
+        }
+      }
+    },
+    "nexBit_frontend": {
+      "dependencies": ["basic_bitcoin"],
+      "source": ["src/nexBit_frontend/dist"],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "bitcoin": {
+      "enabled": true,
+      "nodes": ["127.0.0.1:18444"],
+      "log_level": "info"
+    },
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:4943",
+      "type": "ephemeral",
+      "ecdsa_signing_keys": ["dfx_test_key"]
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

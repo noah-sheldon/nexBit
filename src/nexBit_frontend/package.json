@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "npm i && dfx canister create nexBit_backend && dfx generate nexBit_backend && dfx deploy",
+    "setup": "npm i && dfx canister create basic_bitcoin && dfx generate basic_bitcoin && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "tsc && vite build",

@@ -1,56 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
+// Import the default actor from the generated declarations
+import { createActor } from "../../../declarations/basic_bitcoin"; // Update path to match your project structure
 
 export default function useBlockchainStats() {
   return useQuery({
     queryKey: ["blockchainStats"],
     queryFn: async () => {
-      try {
-        const response = await fetch(
-          "https://www.fcn.social/api/proxy/bitcoin/stats"
-        );
+      // Initialize the default actor
+      const actor = createActor(process.env.CANISTER_ID_BACKEND, {
+        agentOptions: {
+          host: process.env.DFX_NETWORK || "http://localhost:8000",
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error(
-            `Network response was not ok: ${response.statusText}`
-          );
-        }
+      console.log("Default actor initialized, calling get_blockchain_stats...");
 
-        const json = await response.json();
+      const result = await actor.get_blockchain_stats();
+      console.log("Blockchain stats result:", result);
 
-        // Validate the structure and extract the required fields
-        if (json && json.data) {
-          const {
-            blocks,
-            transactions,
-            difficulty,
-            market_price_usd,
-            market_cap_usd,
-            average_transaction_fee_usd_24h,
-            market_dominance_percentage,
-            suggested_transaction_fee_per_byte_sat,
-          } = json.data;
-
-          // Return only the required fields
-          return {
-            blocks,
-            transactions,
-            difficulty,
-            market_price_usd,
-            market_cap_usd,
-            average_transaction_fee_usd_24h,
-            market_dominance_percentage,
-            suggested_transaction_fee_per_byte_sat,
-          };
-        }
-
-        throw new Error("Invalid response structure");
-      } catch (error) {
-        console.error("Error fetching blockchain stats:", error);
-        throw error;
+      if ("Ok" in result) {
+        console.log("Fetched stats:", result.Ok); // Log to verify structure
+        return result.Ok;
+      } else {
+        throw new Error(result.Err || "Failed to fetch blockchain stats");
       }
     },
+    staleTime: 600000, // Cache the result for 10 minutes
     onError: (error) => {
-      console.error("Error in useBlockchainStats:", error);
+      console.error("Error fetching blockchain stats:", error);
     },
   });
 }

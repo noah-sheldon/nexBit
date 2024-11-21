@@ -1,42 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
+import { useActor } from "../Actor"; // Import the actor context for backend calls
 
 export default function useLatestTransactions() {
+  const { actor } = useActor();
+
   return useQuery({
     queryKey: ["latestTransactions"], // Unique key for caching
     queryFn: async () => {
-      const url = "https://www.fcn.social/api/proxy/bitcoin/transactions";
+      if (!actor) {
+        console.error("Actor is not initialized.");
+        throw new Error("Actor is not initialized.");
+      }
 
-      console.log("Fetching latest transactions from:", url);
+      console.log("Fetching latest transactions...");
 
-      try {
-        const response = await fetch(url);
+      const result = await actor.get_latest_transactions(); // Backend call
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.statusText}`);
-        }
-
-        const json = await response.json();
-
-        // Validate and extract required fields
-        if (json?.data && Array.isArray(json.data)) {
-          return json.data.map((transaction) => ({
-            txid: transaction.hash, // Transaction ID
-            time: transaction.time, // Time of transaction
-            input_total_usd: transaction.input_total_usd, // Input total in USD
-            output_total_usd: transaction.output_total_usd, // Output total in USD
-            fee_usd: transaction.fee_usd, // Fee in USD
-          }));
-        } else {
-          throw new Error("Invalid response structure");
-        }
-      } catch (error) {
-        console.error("Error fetching latest transactions:", error);
-        throw error;
+      if ("Ok" in result) {
+        console.log("Fetched latest transactions:", result.Ok);
+        return result.Ok; // Return the successful result
+      } else {
+        throw new Error(result.Err || "Failed to fetch latest transactions.");
       }
     },
+    enabled: !!actor, // Only fetch if the actor is initialized
     staleTime: 600000, // Cache the data for 10 minutes
     onError: (error) => {
-      console.error("Error in useLatestTransactions:", error);
+      console.error("Error fetching latest transactions:", error);
     },
   });
 }

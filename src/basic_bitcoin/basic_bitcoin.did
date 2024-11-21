@@ -19,36 +19,6 @@ type outpoint = record {
   vout : nat32;
 };
 
-type BlockchainStats = record {
-    blocks: nat64;
-    transactions: nat64;
-    difficulty: float64;
-    market_price_usd: float64;
-    market_cap_usd: float64;
-    average_transaction_fee_usd_24h: float64;
-    market_dominance_percentage: float64;
-    suggested_transaction_fee_per_byte_sat: nat64;
-};
-
-type BlockSummary = record {
-    block_height: nat64;
-    block_hash: text;
-    date: text;
-    time: text;
-    transaction_count: nat64;
-    fee_total: nat64;
-    block_size: nat64;
-    difficulty: float64;
-};
-
-type TransactionSummary = record {
-    txid: text;
-    time: text;
-    input_total_usd: float64;
-    output_total_usd: float64;
-    fee_usd: float64;
-};
-
 type utxo = record {
   outpoint : outpoint;
   value : satoshi;
@@ -105,8 +75,4 @@ service : (network) -> {
       amount_in_satoshi : satoshi;
     }
   ) -> (transaction_id);
-
-  "get_blockchain_stats" : () -> (variant { Ok : BlockchainStats; Err : text });
-  "get_latest_blocks" : () -> (variant { Ok : vec BlockSummary; Err : text });
-  "get_latest_transactions" : () -> (variant { Ok : vec TransactionSummary; Err : text });
 };

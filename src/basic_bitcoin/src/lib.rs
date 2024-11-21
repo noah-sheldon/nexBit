@@ -73,10 +73,7 @@ pub struct GetBlockHeadersResponse {
 
 /// Returns the block headers in the given height range.
 #[update]
-pub async fn get_block_headers(
-    start_height: u32,
-    end_height: Option<u32>,
-) -> GetBlockHeadersResponse {
+pub async fn get_block_headers(start_height: u32, end_height: Option<u32>) -> GetBlockHeadersResponse{
     let network = NETWORK.with(|n| n.get());
     bitcoin_api::get_block_headers(network, start_height, end_height).await
 }

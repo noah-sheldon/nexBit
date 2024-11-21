@@ -18,18 +18,18 @@ function Dashboard({ canisterId }) {
         {/* Tabs for Dashboard Sections */}
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            {/* <TabsTrigger value="overview">Overview</TabsTrigger> */}
             <TabsTrigger value="explorer">Explorer</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview">
+          {/* <TabsContent value="overview">
             <div className="space-y-6">
               <NetworkStats />
               <RecentBlocks />
               <RecentTransactions />
             </div>
-          </TabsContent>
+          </TabsContent> */}
 
           {/* Explorer Tab */}
           <TabsContent value="explorer">
