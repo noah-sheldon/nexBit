@@ -1,5 +1,5 @@
 [workspace]
 members = [
-    "src/nexBit_backend"
+    "src/basic_bitcoin"
 ]
 resolver = "2"

@@ -1,11 +1,17 @@
 /// <reference types="vitest" />
-import { fileURLToPath, URL } from 'url';
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
-import environment from 'vite-plugin-environment';
-import dotenv from 'dotenv';
+import { fileURLToPath, URL } from "url";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import environment from "vite-plugin-environment";
+import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: "../../.env" });
+
+process.env.II_URL =
+  process.env.DFX_NETWORK === "local"
+    ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`
+    : `https://identity.ic0.app`;
 
 export default defineConfig({
   build: {
@@ -30,18 +36,21 @@ export default defineConfig({
     react(),
     environment("all", { prefix: "CANISTER_" }),
     environment("all", { prefix: "DFX_" }),
+    environment(["II_URL"]),
   ],
   test: {
-    environment: 'jsdom',
-    setupFiles: 'src/setupTests.js',
+    environment: "jsdom",
+    setupFiles: "src/setupTests.js",
   },
   resolve: {
     alias: [
       {
         find: "declarations",
-        replacement: fileURLToPath(
-          new URL("../declarations", import.meta.url)
-        ),
+        replacement: fileURLToPath(new URL("../declarations", import.meta.url)),
+      },
+      {
+        find: "@",
+        replacement: path.resolve(__dirname, "./src"),
       },
     ],
   },
