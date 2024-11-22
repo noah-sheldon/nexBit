@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Explorer from "@/components/dashboard/Explorer";
 import { FaBitcoin } from "react-icons/fa";
 
-function Dashboard({ canisterId }) {
+function Dashboard({ canisterId, isAuthenticated }) {
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white flex justify-center">
       <div className="max-w-screen-lg w-full space-y-6">
@@ -14,7 +14,10 @@ function Dashboard({ canisterId }) {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="mb-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            {/* <TabsTrigger value="explorer">Explorer</TabsTrigger> */}
+            {/* Show Explorer Tab only if logged in */}
+            {isAuthenticated && (
+              <TabsTrigger value="explorer">Explorer</TabsTrigger>
+            )}
           </TabsList>
 
           {/* Overview Tab */}
@@ -27,9 +30,11 @@ function Dashboard({ canisterId }) {
           </TabsContent>
 
           {/* Explorer Tab */}
-          <TabsContent value="explorer">
-            <Explorer />
-          </TabsContent>
+          {isAuthenticated && (
+            <TabsContent value="explorer">
+              <Explorer />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>

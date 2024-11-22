@@ -50,9 +50,19 @@ const App = () => {
         }
         return <Wallet canisterId={currentCanisterId} />;
       case "/":
-        return <Dashboard canisterId={currentCanisterId} />;
+        return (
+          <Dashboard
+            canisterId={currentCanisterId}
+            isAuthenticated={!!principal}
+          />
+        );
       default:
-        return <Dashboard canisterId={currentCanisterId} />;
+        return (
+          <Dashboard
+            canisterId={currentCanisterId}
+            isAuthenticated={!!principal}
+          />
+        );
     }
   };
 
