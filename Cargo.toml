@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/nexBit_backend"
+]
+resolver = "2"
