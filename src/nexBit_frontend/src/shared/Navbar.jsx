@@ -12,9 +12,8 @@ import { FaBitcoin } from "react-icons/fa";
 import useP2pkhAddress from "@/hooks/useP2pkhAddress";
 import { useToast } from "@/hooks/use-toast";
 import { useInternetIdentity } from "ic-use-internet-identity";
-import { Link } from "react-router-dom"; // Import React Router's Link
 
-const Navbar = ({ canisterId }) => {
+const Navbar = ({ navigate, canisterId }) => {
   const { identity } = useInternetIdentity();
   const principal = identity?.getPrincipal(); // Determine if the user is logged in
   const isAuthenticated = !!principal;
@@ -55,36 +54,36 @@ const Navbar = ({ canisterId }) => {
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 px-6 py-4 shadow-md text-white">
       <div className="container mx-auto flex flex-wrap justify-between items-center">
         {/* Logo */}
-        <Link
-          to="/" // Use Link for navigating to the dashboard
+        <button
+          onClick={() => navigate("/", { canisterId })}
           className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2"
         >
           <FaBitcoin className="text-yellow-500" />
           nexBit
-        </Link>
+        </button>
 
         {/* Navigation Links */}
         <div className="flex flex-wrap items-center gap-4 mt-2 md:mt-0">
           {/* Explorer Link - Always Visible */}
-          <Link
-            to="/" // Use Link for navigating to the dashboard
-            className="hover:text-black/80 transition text-white"
-          >
-            <Button variant="link" asChild>
+          <Button variant="link" asChild>
+            <button
+              onClick={() => navigate("/", { canisterId })}
+              className="hover:text-black/80 transition text-white"
+            >
               Explorer
-            </Button>
-          </Link>
+            </button>
+          </Button>
 
           {/* Wallet Link - Visible Only to Authenticated Users */}
           {isAuthenticated && (
-            <Link
-              to="/wallet" // Use Link for navigating to the wallet
-              className="hover:text-black/80 transition text-white"
-            >
-              <Button variant="link" asChild>
+            <Button variant="link" asChild>
+              <button
+                onClick={() => navigate("/wallet", { canisterId })}
+                className="hover:text-black/80 transition text-white"
+              >
                 Wallet
-              </Button>
-            </Link>
+              </button>
+            </Button>
           )}
 
           {/* BTC Address Copy - Visible Only to Authenticated Users */}
