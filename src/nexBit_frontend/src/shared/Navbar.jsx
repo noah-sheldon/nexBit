@@ -114,7 +114,13 @@ const Navbar = ({ navigate, canisterId }) => {
           )}
 
           {/* Logout Button - Visible Only to Authenticated Users */}
-          {isAuthenticated && <Logout className="ml-4" />}
+          {isAuthenticated && (
+            <Logout
+              className="ml-4"
+              navigate={navigate}
+              canisterId={canisterId}
+            />
+          )}
 
           {/* Login Button - Visible Only to Unauthenticated Users */}
           {!isAuthenticated && <Login />}

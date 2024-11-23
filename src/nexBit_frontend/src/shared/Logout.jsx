@@ -3,7 +3,7 @@ import { useInternetIdentity } from "ic-use-internet-identity";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-function Logout({ className }) {
+function Logout({ className, navigate, canisterId }) {
   const { clear } = useInternetIdentity();
   const { toast } = useToast();
 
@@ -14,6 +14,7 @@ function Logout({ className }) {
       description: "You have successfully logged out.",
       variant: "success",
     });
+    navigate("/wallet", { canisterId }); // Use the navigate function passed as a prop
   };
 
   return (
