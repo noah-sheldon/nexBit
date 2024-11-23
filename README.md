@@ -5,7 +5,7 @@
 **Manage your Bitcoin securely on the Internet Computer.**
 
 [**Live Demo**](https://uukoy-xaaaa-aaaap-anubq-cai.icp0.io/)  
-[**Watch the Demo on YouTube**](https://youtu.be/example)
+[**Watch the Demo on YouTube**](https://youtu.be/qFVmAdIP3Dk)
 
 ---
 
