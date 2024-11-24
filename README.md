@@ -4,7 +4,7 @@
 
 **Manage your Bitcoin securely on the Internet Computer.**
 
-[**Live Demo**](https://uukoy-xaaaa-aaaap-anubq-cai.icp0.io/)  
+[**Live Demo**](https://7e3lh-5yaaa-aaaaj-azwka-cai.icp0.io/)  
 [**Watch the Demo on YouTube**](https://youtu.be/qFVmAdIP3Dk)
 
 ---
@@ -54,7 +54,7 @@
 ## Live Demo
 
 Experience the nexBit Wallet live:  
-[**Live Demo**](https://uukoy-xaaaa-aaaap-anubq-cai.icp0.io/)
+[**Live Demo**](https://7e3lh-5yaaa-aaaaj-azwka-cai.icp0.io/)
 
 ---
 

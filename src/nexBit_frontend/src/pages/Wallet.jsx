@@ -66,7 +66,7 @@ export default function Wallet() {
   const handleSend = async (e) => {
     e.preventDefault();
 
-    const amountInSatoshi = parseFloat(amount) * 1e8; // Convert BTC to satoshis
+    const amountInSatoshi = parseInt(amount, 10); // Directly treat the amount as satoshis
 
     if (amountInSatoshi > balance) {
       toast({
@@ -80,7 +80,7 @@ export default function Wallet() {
     try {
       const txId = await sendTransaction.mutateAsync({
         destination_address: destination,
-        amount_in_satoshi: amountInSatoshi,
+        amount_in_satoshi: amountInSatoshi, // Already in satoshis
       });
 
       setTransactionResult(txId);
@@ -140,10 +140,10 @@ export default function Wallet() {
             />
             <Input
               type="number"
-              placeholder="Amount to send (BTC)"
+              placeholder="Amount to send (satoshis)"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              step="0.00000001"
+              step="1"
               min="0"
               required
               className="bg-gray-800 text-gray-300"
